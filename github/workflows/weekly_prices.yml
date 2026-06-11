@@ -1,0 +1,36 @@
+name: Weekly Price Checker
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  check-prices:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Get code
+      uses: actions/checkout@v4
+    
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install Playwright
+      run: |
+        pip install playwright
+        playwright install chromium
+        playwright install-deps
+    
+    - name: Run price checker
+      run: python price_tracker.py
+    
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: price-results
+        path: |
+          *.json
+          *.html
